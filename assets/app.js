@@ -238,11 +238,6 @@
           return;
         }
 
-        if (data.result === "high") {
-          window.location.href = pageUrl("result-high-frequency.html", resultSerial, code, data.count || 11);
-          return;
-        }
-
         window.location.href = pageUrl("result-genuine.html", resultSerial, code, data.count || 1);
       } catch (err) {
         error.textContent = COPY.systemError;

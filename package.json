@@ -5,8 +5,5 @@
   "type": "module",
   "scripts": {
     "check": "node --check assets/app.js && node --check api/verify.js"
-  },
-  "dependencies": {
-    "@vercel/blob": "^2.4.0"
   }
 }

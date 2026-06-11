@@ -1,13 +1,7 @@
-import { list, put } from "@vercel/blob";
-
 const PRODUCTS = {
   "10617346508908": ["19001", "19002", "19003", "19004", "19005"],
   "10617317570606": ["60400", "60401", "60402", "60403", "60404"]
 };
-
-const TEST_CODES = ["99999"];
-const COUNT_LIMIT = 10;
-const ACCESS = "private";
 
 function json(data, status = 200) {
   return Response.json(data, {
@@ -18,48 +12,24 @@ function json(data, status = 200) {
   });
 }
 
-function cleanSerial(value) {
-  return String(value || "").replace(/\D/g, "").slice(0, 20);
-}
-
 function cleanCode(value) {
   return String(value || "").replace(/\D/g, "").slice(0, 5);
 }
 
-function resolveCode(inputSerial, code) {
+function resolveCode(code) {
   const productMatch = Object.entries(PRODUCTS).find(([, codes]) => codes.includes(code));
 
   if (productMatch) {
     return {
       valid: true,
-      serial: productMatch[0],
-      type: "product"
-    };
-  }
-
-  if (TEST_CODES.includes(code)) {
-    return {
-      valid: true,
-      serial: Object.prototype.hasOwnProperty.call(PRODUCTS, inputSerial) ? inputSerial : "test",
-      type: "test"
+      serial: productMatch[0]
     };
   }
 
   return {
     valid: false,
     serial: "",
-    type: "unknown"
   };
-}
-
-function eventPrefix(serial, code) {
-  return `swisse-query-events/${serial}/${code}/`;
-}
-
-function eventPath(serial, code) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const id = crypto.randomUUID();
-  return `${eventPrefix(serial, code)}${timestamp}-${id}.json`;
 }
 
 export async function POST(request) {
@@ -71,14 +41,13 @@ export async function POST(request) {
     return json({ ok: false, error: "invalid_json" }, 400);
   }
 
-  const serial = cleanSerial(body.serial);
   const code = cleanCode(body.code);
 
   if (code.length !== 5) {
     return json({ ok: false, error: "invalid_input" }, 400);
   }
 
-  const resolved = resolveCode(serial, code);
+  const resolved = resolveCode(code);
 
   if (!resolved.valid) {
     return json({
@@ -89,36 +58,12 @@ export async function POST(request) {
     });
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return json({ ok: false, error: "blob_storage_not_configured" }, 500);
-  }
-
-  const path = eventPath(resolved.serial, code);
-  const payload = JSON.stringify({
-    serial: resolved.serial,
-    code,
-    type: resolved.type,
-    checkedAt: new Date().toISOString()
-  });
-
-  await put(path, payload, {
-    access: ACCESS,
-    addRandomSuffix: false,
-    contentType: "application/json"
-  });
-
-  const queryEvents = await list({
-    prefix: eventPrefix(resolved.serial, code),
-    limit: COUNT_LIMIT + 1
-  });
-  const count = queryEvents.blobs.length;
-
   return json({
     ok: true,
-    result: count > COUNT_LIMIT ? "high" : "genuine",
+    result: "genuine",
     valid: true,
     serial: resolved.serial,
-    count
+    count: 1
   });
 }
 
