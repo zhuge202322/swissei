@@ -1,5 +1,4 @@
 (function () {
-  var DEFAULT_SERIAL = "10617346508908";
   var SEARCH = new URLSearchParams(window.location.search);
 
   var TEXT = {
@@ -11,6 +10,7 @@
       scratchType: "涂层款",
       boxType: "盒盖款",
       serialLabel: "产品序列号:",
+      autoSerial: "自动识别",
       placeholder: "请输入5位防伪码数字",
       verifyButton: "验证",
       verifying: "验证中",
@@ -41,6 +41,7 @@
       scratchType: "Model lapisan gosok",
       boxType: "Model tutup kotak",
       serialLabel: "Nomor seri produk:",
+      autoSerial: "Identifikasi otomatis",
       placeholder: "Masukkan 5 digit kode anti-pemalsuan",
       verifyButton: "Verifikasi",
       verifying: "Memverifikasi",
@@ -78,7 +79,7 @@
   var COPY = TEXT[LANG] || TEXT.zh;
 
   function getSerial() {
-    return SEARCH.get("sn") || SEARCH.get("serial") || SEARCH.get("product") || DEFAULT_SERIAL;
+    return (SEARCH.get("sn") || SEARCH.get("serial") || SEARCH.get("product") || "").replace(/\D/g, "").slice(0, 20);
   }
 
   function getCode() {
@@ -183,7 +184,7 @@
     if (!form || !serialDisplay || !codeInput || !modal) return;
 
     applyHomeCopy();
-    serialDisplay.textContent = serial;
+    serialDisplay.textContent = serial || COPY.autoSerial;
     if (codeFromQuery && !codeInput.value) codeInput.value = codeFromQuery;
 
     function setLoading(isLoading) {
@@ -230,17 +231,19 @@
           throw new Error(data.error || "verify_failed");
         }
 
+        var resultSerial = data.serial && data.serial !== "test" ? data.serial : serial;
+
         if (data.result === "error") {
           window.location.href = pageUrl("result-error.html", serial, code);
           return;
         }
 
         if (data.result === "high") {
-          window.location.href = pageUrl("result-high-frequency.html", serial, code, data.count || 11);
+          window.location.href = pageUrl("result-high-frequency.html", resultSerial, code, data.count || 11);
           return;
         }
 
-        window.location.href = pageUrl("result-genuine.html", serial, code, data.count || 1);
+        window.location.href = pageUrl("result-genuine.html", resultSerial, code, data.count || 1);
       } catch (err) {
         error.textContent = COPY.systemError;
         setLoading(false);

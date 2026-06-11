@@ -1,10 +1,11 @@
 import { list, put } from "@vercel/blob";
 
 const PRODUCTS = {
-  "10617346508908": ["19001", "19002", "19003", "19004", "19005", "99999"],
-  "10617317570606": ["60400", "60401", "60402", "60403", "60404", "99999"]
+  "10617346508908": ["19001", "19002", "19003", "19004", "19005"],
+  "10617317570606": ["60400", "60401", "60402", "60403", "60404"]
 };
 
+const TEST_CODES = ["99999"];
 const COUNT_LIMIT = 10;
 const ACCESS = "private";
 
@@ -25,8 +26,30 @@ function cleanCode(value) {
   return String(value || "").replace(/\D/g, "").slice(0, 5);
 }
 
-function isValidCode(serial, code) {
-  return Object.prototype.hasOwnProperty.call(PRODUCTS, serial) && PRODUCTS[serial].includes(code);
+function resolveCode(inputSerial, code) {
+  const productMatch = Object.entries(PRODUCTS).find(([, codes]) => codes.includes(code));
+
+  if (productMatch) {
+    return {
+      valid: true,
+      serial: productMatch[0],
+      type: "product"
+    };
+  }
+
+  if (TEST_CODES.includes(code)) {
+    return {
+      valid: true,
+      serial: Object.prototype.hasOwnProperty.call(PRODUCTS, inputSerial) ? inputSerial : "test",
+      type: "test"
+    };
+  }
+
+  return {
+    valid: false,
+    serial: "",
+    type: "unknown"
+  };
 }
 
 function eventPrefix(serial, code) {
@@ -51,11 +74,13 @@ export async function POST(request) {
   const serial = cleanSerial(body.serial);
   const code = cleanCode(body.code);
 
-  if (serial.length === 0 || code.length !== 5) {
+  if (code.length !== 5) {
     return json({ ok: false, error: "invalid_input" }, 400);
   }
 
-  if (!isValidCode(serial, code)) {
+  const resolved = resolveCode(serial, code);
+
+  if (!resolved.valid) {
     return json({
       ok: true,
       result: "error",
@@ -68,10 +93,11 @@ export async function POST(request) {
     return json({ ok: false, error: "blob_storage_not_configured" }, 500);
   }
 
-  const path = eventPath(serial, code);
+  const path = eventPath(resolved.serial, code);
   const payload = JSON.stringify({
-    serial,
+    serial: resolved.serial,
     code,
+    type: resolved.type,
     checkedAt: new Date().toISOString()
   });
 
@@ -82,7 +108,7 @@ export async function POST(request) {
   });
 
   const queryEvents = await list({
-    prefix: eventPrefix(serial, code),
+    prefix: eventPrefix(resolved.serial, code),
     limit: COUNT_LIMIT + 1
   });
   const count = queryEvents.blobs.length;
@@ -91,6 +117,7 @@ export async function POST(request) {
     ok: true,
     result: count > COUNT_LIMIT ? "high" : "genuine",
     valid: true,
+    serial: resolved.serial,
     count
   });
 }
