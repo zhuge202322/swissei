@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Swisse 斯维诗防伪查询</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body data-page="home">
+    <div class="site">
+      <header class="brand-bar" aria-label="Swisse">
+        <img src="assets/head.png" alt="Swisse 斯维诗" />
+      </header>
+
+      <main class="content verify-content">
+        <h1>SWISSE产品正品验证</h1>
+        <p class="intro">请确认防伪码类型，刮开涂层或开启包装顶部盒盖，查询5位防伪数字</p>
+
+        <section class="code-guide" aria-label="防伪码位置示意">
+          <figure class="guide-item">
+            <div class="qr-demo" aria-hidden="true">
+              <svg viewBox="0 0 120 120" role="img">
+                <rect width="120" height="120" fill="#fff" />
+                <path d="M12 12h30v30H12zM78 12h30v30H78zM12 78h30v30H12z" fill="none" stroke="#111" stroke-width="8" />
+                <path d="M24 24h6v6h-6zM90 24h6v6h-6zM24 90h6v6h-6zM54 12h8v8h-8zM66 12h6v6h-6zM50 28h8v8h-8zM64 28h8v8h-8zM48 46h8v8h-8zM60 46h14v8H60zM84 50h8v8h-8zM100 52h8v8h-8zM50 64h8v8h-8zM66 64h8v8h-8zM82 66h8v8h-8zM98 72h8v8h-8zM50 82h12v8H50zM68 84h8v8h-8zM84 86h8v8h-8zM98 96h8v8h-8zM50 102h8v8h-8zM64 104h8v8h-8z" fill="#111" />
+              </svg>
+              <span class="scratch-line"></span>
+            </div>
+            <figcaption>涂层款</figcaption>
+          </figure>
+          <figure class="guide-item">
+            <div class="box-demo" aria-hidden="true">
+              <div class="box-top"></div>
+              <div class="box-neck"></div>
+              <div class="box-body"></div>
+              <div class="code-bubble">74800</div>
+              <span class="red-pointer"></span>
+              <span class="small-ring"></span>
+            </div>
+            <figcaption>盒盖款</figcaption>
+          </figure>
+        </section>
+
+        <form class="verify-form" id="verify-form" novalidate>
+          <label class="serial-label">产品序列号: <span id="serial-display">10617346508908</span></label>
+          <input
+            id="code-input"
+            class="code-input"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="5"
+            autocomplete="one-time-code"
+            placeholder="请输入5位防伪码数字"
+            aria-label="请输入5位防伪码数字"
+          />
+          <p class="form-error" id="form-error" aria-live="polite"></p>
+          <button class="primary-button" type="submit">验证</button>
+        </form>
+
+        <section class="notes" aria-label="查询提示">
+          <p>* 部分没有印刷防伪码产品暂不支持查询</p>
+          <p>* Swisse防伪查询唯一合法域名为swisse.com，正品经扫码可直接从本页网址看到或点击微信扫码后界面右上角[...]看到swisse.com域名，请注意甄别，谨防受骗。</p>
+        </section>
+
+        <footer class="social-footer" aria-label="官方账号">
+          <div class="social-icons">
+            <span class="wechat-icon" aria-hidden="true">微信</span>
+            <span class="facebook-icon" aria-hidden="true">f</span>
+          </div>
+          <p>关注官方账号及时获取更多精彩资讯</p>
+        </footer>
+      </main>
+
+      <div class="location-modal" id="location-modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="location-title">
+          <button class="modal-close" type="button" data-location-choice="close" aria-label="关闭"></button>
+          <div class="pin-icon" aria-hidden="true"></div>
+          <h2 id="location-title">是否允许‘Swisse斯维诗防伪查询’获取此设备的位置信息？以帮助我们更好的建立防伪体系</h2>
+          <button class="modal-button" type="button" data-location-choice="allow">同意授权</button>
+          <button class="modal-button" type="button" data-location-choice="deny">拒绝</button>
+        </section>
+      </div>
+    </div>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>

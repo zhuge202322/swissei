@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Swisse 防伪查询结果</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body data-page="result" data-result="genuine">
+    <div class="site">
+      <header class="brand-bar" aria-label="Swisse">
+        <img src="assets/head.png" alt="Swisse 斯维诗" />
+      </header>
+
+      <main class="content result-content">
+        <h1>查询产品为正品</h1>
+        <div class="result-message">
+          <span class="status-icon success-icon" aria-hidden="true"></span>
+          <p>该产品为第 <span id="query-count">1</span> 次查询，请放心使用</p>
+        </div>
+        <div class="result-actions single-action">
+          <button class="primary-button" type="button" data-action="back">返回</button>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>
